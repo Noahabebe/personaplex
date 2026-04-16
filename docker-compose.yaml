@@ -7,10 +7,8 @@ services:
       - "8998:8998"
     environment:
       - NO_TORCH_COMPILE=1
+      - CUDA_VISIBLE_DEVICES=""   # disables GPU usage
     env_file:
       - .env
-    deploy:
-      resources:
-        reservations:
     volumes:
       - ./.cache:/root/.cache
