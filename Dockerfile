@@ -1,25 +1,31 @@
-ARG BASE_IMAGE="nvcr.io/nvidia/cuda"
-ARG BASE_IMAGE_TAG="12.4.1-runtime-ubuntu22.04"
+FROM python:3.12-slim AS base
 
-FROM ${BASE_IMAGE}:${BASE_IMAGE_TAG} AS base
-
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
-
+# Install system deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     pkg-config \
     libopus-dev \
  && rm -rf /var/lib/apt/lists/*
 
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
 WORKDIR /app/moshi/
 
+# Copy project
 COPY moshi/ /app/moshi/
+
+# Create virtual env
 RUN uv venv /app/moshi/.venv --python 3.12
+
+# 🔑 Force CPU PyTorch BEFORE syncing
+ENV UV_PIP_EXTRA_INDEX_URL=https://download.pytorch.org/whl/cpu
+
 RUN uv sync
 
+# SSL dir
 RUN mkdir -p /app/ssl
 
 EXPOSE 8998
 
-ENTRYPOINT []
 CMD ["/app/moshi/.venv/bin/python", "-m", "moshi.server", "--ssl", "/app/ssl"]
