@@ -19,9 +19,11 @@ COPY moshi/ /app/moshi/
 RUN uv venv /app/moshi/.venv --python 3.12
 
 # 🔑 Force CPU PyTorch BEFORE syncing
-ENV UV_PIP_EXTRA_INDEX_URL=https://download.pytorch.org/whl/cpu
+ Force CPU torch FIRST
+RUN uv pip install torch --index-url https://download.pytorch.org/whl/cpu
 
-RUN uv sync
+# Then install rest
+RUN uv sync --no-dev
 
 # SSL dir
 RUN mkdir -p /app/ssl
