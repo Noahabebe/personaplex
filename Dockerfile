@@ -19,8 +19,8 @@ COPY moshi/ /app/moshi/
 RUN uv venv /app/moshi/.venv --python 3.12
 
 # 🔑 Force CPU PyTorch BEFORE syncing
- Force CPU torch FIRST
-RUN uv pip install torch --index-url https://download.pytorch.org/whl/cpu
+# Force CPU torch FIRST
+RUN uv pip install --python /app/moshi/.venv/bin/python torch --index-url https://download.pytorch.org/whl/cpu
 
 # Then install rest
 RUN uv sync --no-dev
